@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Web Scraper</title>
+</head>
+<body>
+    <h1>Welcome to My Web Scraper</h1>
+    <form>
+        <label for="url">Enter URL:</label>
+        <input type="text" id="url" name="url" required>
+        <input type="submit" value="Scrape">
+    </form>
+
+    <div id="received-data">
+        <h2>Received Selectors:</h2>
+        <ul id="selector-list"></ul>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        let url = document.getElementById('url').value;
+
+        // Check if URL already has query parameters
+        if (url.includes('?')) {
+            url += '&scrape=true'; // Append with '&'
+        } else {
+            url += '?scrape=true'; // Append with '?'
+        }
+
+        window.open(url, '_blank'); // Open in a new tab with the modified URL
+    });
+
+            function fetchData() {
+                fetch('http://localhost:5000/get_data')
+                    .then(response => response.json())
+                    .then(data => {
+                        const list = document.getElementById('selector-list');
+                        list.innerHTML = '';  // Clear existing list
+                        data.forEach(item => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = `URL: ${item.url}, Selector: ${item.selector}`;
+                            list.appendChild(listItem);
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            setInterval(fetchData, 5000); // Fetch data every 5 seconds
+        });
+    </script>
+</body>
+</html>
